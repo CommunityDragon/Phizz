@@ -30,7 +30,7 @@ class ApiGenerator extends Generator
     public function definitions(): array
     {
         return [
-             ...array_values($this->objectMapping()),
+            ...array_values($this->objectMapping()),
             $this->definition(),
         ];
     }

@@ -259,7 +259,7 @@ class ApiDefinition extends Definition implements Writable
         $body = "\$this->fetch(\n";
         $body .= "    method: '$httpMethod',\n";
         $body .= "    endpoint: \"$endpoint\",\n";
-        $body .= "    returns: " . ($returns ? 'true' : 'false') . ",\n";
+        $body .= '    returns: '.($returns ? 'true' : 'false').",\n";
         $body .= "    platformType: $platformType::class,\n";
 
         if (! blank($returnType) && $returnType !== true) {
