@@ -10,10 +10,8 @@ class PhizzGenerator extends Generator
     public function definitions(): array
     {
         return [
-
-            //            ...(new RouteGenerator(config: $this->config))->definitions(),
-            //            ...(new EnumGenerator(config: $this->config))->definitions(),
-            //            ...(new ObjectGenerator(config: $this->config, game: 'riot', api: 'account-v1'))->definitions(),
+            ...(new RouteGenerator(config: $this->config))->definitions(),
+            ...(new EnumGenerator(config: $this->config))->definitions(),
             ...(new ClientGenerator(config: $this->config))->definitions(),
         ];
     }
