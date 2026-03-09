@@ -1,0 +1,77 @@
+{
+    "name": "communitydragon/phizz",
+    "version": "0.0.1-dev",
+    "description": "An auto-generated PHP library for Riot API",
+    "keywords": [
+        "communitydragon",
+        "laravel",
+        "phizz"
+    ],
+    "homepage": "https://github.com/communitydragon/phizz",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sandi Karajic",
+            "email": "info@bros.dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-intl": "*",
+        "guzzlehttp/guzzle": "^7.10",
+        "illuminate/contracts": "^10.0||^11.0||^12.0",
+        "illuminate/support": "^10.0||^11.0||^12.0",
+        "spatie/laravel-package-tools": "^1.93",
+        "symfony/console": "^6.4"
+    },
+    "require-dev": {
+        "cebe/php-openapi": "^1.8",
+        "jawira/case-converter": "^3.6",
+        "laravel/pint": "^1.20",
+        "nette/php-generator": "^4.2",
+        "nunomaduro/collision": "^6.4",
+        "pestphp/pest": "^1.23",
+        "symfony/filesystem": "^6.4",
+        "symfony/finder": "^6.4",
+        "symfony/http-client": "^6.4",
+        "symfony/var-dumper": "^6.4",
+        "symfony/yaml": "^6.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phizz\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Phizz\\Tests\\": "tests/",
+            "Phizz\\Generator\\": "generator/"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Phizz\\Providers\\PhizzServiceProvider"
+            ],
+            "aliases": {
+                "Phizz": "Phizz\\Facades\\Phizz"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

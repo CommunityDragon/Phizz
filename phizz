@@ -1,0 +1,101 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use NunoMaduro\Collision\Provider as Collision;
+use Phizz\Generator\Generators\PhizzGenerator;
+use Phizz\Generator\Objects\Configuration;
+use Phizz\Generator\Parsers\FileParser;
+use Phizz\Generator\Parsers\SchemaParser;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+// create a new symfony console application
+$application = new Application();
+
+// register nunomaduro/collision
+(new Collision)->register();
+
+$application->add(new Command("generate"))
+    ->addOption(
+        name: "schema",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI schema file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/openapi-3.0.0.json"
+    )
+    ->addOption(
+        name: "routes",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI routes table file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/routesTable.json"
+    )
+    ->addOption(
+        name: "seasons",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI seasons file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/enums/seasons.json"
+    )
+    ->addOption(
+        name: "queues",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI queues file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/enums/queues.json"
+    )
+    ->addOption(
+        name: "maps",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI maps file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/enums/maps.json"
+    )
+    ->addOption(
+        name: "game-modes",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI game modes file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/enums/gameModes.json"
+    )
+    ->addOption(
+        name: "game-types",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI game types file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/enums/gameTypes.json"
+    )
+    ->addOption(
+        name: "queue-types",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "RiotAPI queue types file path/url",
+        default: "https://www.mingweisamuel.com/riotapi-schema/enums/queueTypes.json"
+    )
+    ->setCode(function (InputInterface $input, OutputInterface $output): int {
+        // create the parsers
+        $fp = new FileParser(console: $output);
+        $sp = new SchemaParser(console: $output);
+
+        // create the generator
+        $generator = new PhizzGenerator(
+            config: new Configuration(
+                console: $output,
+                schema: $sp->parse(file: $input->getOption("schema")),
+                routes: $fp->parse(file: $input->getOption("routes")),
+                enums: [
+                    'season' => $fp->parse(file: $input->getOption("seasons")),
+                    'queue' => $fp->parse(file: $input->getOption("queues")),
+                    'map' => $fp->parse(file: $input->getOption("maps")),
+                    'gameMode' => $fp->parse(file: $input->getOption("game-modes")),
+                    'gameType' => $fp->parse(file: $input->getOption("game-types")),
+                    'queueType' => $fp->parse(file: $input->getOption("queue-types")),
+                ]
+            )
+        );
+
+        // generate the code
+        $generator->generate();
+
+        return Command::SUCCESS;
+    });
+
+/** @noinspection PhpUnhandledExceptionInspection */
+$application->run();
