@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Riot Games API Key
@@ -10,6 +11,7 @@ return [
     | It is recommended to store this in your .env file as RIOT_API_KEY.
     |
     */
+
     'api_key' => env('RIOT_API_KEY', ''),
 
     /*
@@ -21,6 +23,7 @@ return [
     | on a per‑call basis.
     |
     */
+
     'default_platform' => env('RIOT_DEFAULT_PLATFORM', \Phizz\Enums\Platform::NA),
 
     /*
@@ -31,6 +34,7 @@ return [
     | The maximum number of seconds to wait for a response from the Riot API.
     |
     */
+
     'timeout' => env('RIOT_TIMEOUT', 60),
 
     /*
@@ -41,6 +45,7 @@ return [
     | Enable or disable caching of API responses.
     |
     */
+
     'cache' => [
         'enabled' => env('RIOT_CACHE_ENABLED', true),
         'default' => env('RIOT_CACHE_TTL', 60), // 1 minute
@@ -57,7 +62,9 @@ return [
     | Log all API requests and responses? Useful for debugging.
     |
     */
+
     'logging' => [
         'enabled' => env('RIOT_LOGGING_ENABLED', false),
     ],
+
 ];
