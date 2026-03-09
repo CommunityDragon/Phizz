@@ -1,16 +1,16 @@
-# Phizz - An auto-generated PHP library for Riot API
+# Phizz - An auto-generated Laravel library for Riot API
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/communitydragon/phizz.svg?style=flat-square)](https://packagist.org/packages/communitydragon/phizz)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/communitydragon/phizz/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/communitydragon/phizz/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/communitydragon/phizz/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/communitydragon/phizz/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/communitydragon/phizz.svg?style=flat-square)](https://packagist.org/packages/communitydragon/phizz)
 
-A type-safe, auto-generated PHP client for the Riot Games API, built as a Laravel package. It provides fluent access to League of Legends, Teamfight Tactics, Legends of Runeterra, Valorant, and Riftbound APIs — all generated from official OpenAPI schemas.
+A type-safe, auto-generated Laravel client for the Riot Games API. It provides fluent access to League of Legends, Teamfight Tactics, Legends of Runeterra, Valorant, and Riftbound APIs — all generated from official OpenAPI schemas.
 
 ## Requirements
 
-- PHP ^8.1
-- Laravel 10, 11, or 12
+- PHP `^8.1`
+- Laravel `^10`
 
 ## Installation
 
@@ -38,7 +38,7 @@ RIOT_DEFAULT_PLATFORM=na1
 return [
     'api_key'          => env('RIOT_API_KEY', ''),
     'default_platform' => env('RIOT_DEFAULT_PLATFORM', Platform::NA),
-    'timeout'          => env('RIOT_TIMEOUT', 60),
+    'timeout'          => env('RIOT_TIMEOUT', 60), // seconds
     'cache' => [
         'enabled' => env('RIOT_CACHE_ENABLED', true),
         'default' => env('RIOT_CACHE_TTL', 60), // seconds
