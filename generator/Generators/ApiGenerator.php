@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Phizz\Generator\Definitions\ApiDefinition;
 use Phizz\Generator\Definitions\ObjectDefinition;
+use Phizz\Generator\Definitions\TtlDefinition;
 use Phizz\Generator\Objects\ApiRoute;
 use Phizz\Generator\Objects\Configuration;
 
@@ -32,7 +33,17 @@ class ApiGenerator extends Generator
         return [
             ...array_values($this->objectMapping()),
             $this->definition(),
+            $this->ttl(),
         ];
+    }
+
+    public function ttl(): TtlDefinition
+    {
+        return new TtlDefinition(
+            game: $this->game,
+            api: $this->api,
+            routes: $this->routes(),
+        );
     }
 
     public function definition(): ApiDefinition
@@ -67,7 +78,6 @@ class ApiGenerator extends Generator
     protected function objects(): array
     {
         return collect($this->config->schema->components->schemas ?? [])
-            ->filter(fn (Schema $schema) => $schema instanceof Schema)
             ->filter(fn ($_, string $key) => Str::startsWith($key, "$this->api."))
             ->toArray();
     }
@@ -77,7 +87,7 @@ class ApiGenerator extends Generator
      */
     protected function routes(): array
     {
-        return collect($this->config->schema->paths->getPaths() ?? [])
+        return collect($this->config->schema->paths->getPaths())
             ->filter()
             ->map(fn (PathItem $path) => collect($path->getOperations()))
             ->map(fn (Collection $operations, string $endpoint) => $operations

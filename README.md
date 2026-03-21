@@ -1,8 +1,8 @@
 # Phizz - An auto-generated Laravel library for Riot API
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/communitydragon/phizz.svg?style=flat-square)](https://packagist.org/packages/communitydragon/phizz)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/communitydragon/phizz/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/communitydragon/phizz/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/communitydragon/phizz/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/communitydragon/phizz/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/communitydragon/phizz/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/communitydragon/phizz/actions?query=workflow%3Arun-tests+branch%3Amaster)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/communitydragon/phizz/fix-php-code-style-issues.yml?branch=master&label=code%20style&style=flat-square)](https://github.com/communitydragon/phizz/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/communitydragon/phizz.svg?style=flat-square)](https://packagist.org/packages/communitydragon/phizz)
 
 A type-safe, auto-generated Laravel client for the Riot Games API. It provides fluent access to League of Legends, Teamfight Tactics, Legends of Runeterra, Valorant, and Riftbound APIs — all generated from official OpenAPI schemas.

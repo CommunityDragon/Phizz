@@ -6,5 +6,6 @@ parameters:
     paths:
         - src
         - config
-        - database
+        - generator
+        - phizz
     tmpDir: build/phpstan

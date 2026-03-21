@@ -8,6 +8,7 @@ use Closure;
 use Phizz\Generator\Definitions\ApiDefinition;
 use Phizz\Generator\Definitions\GameDefinition;
 use Phizz\Generator\Definitions\ObjectDefinition;
+use Phizz\Generator\Definitions\TtlGameDefinition;
 use Phizz\Generator\Objects\Configuration;
 
 class GameGenerator extends Generator
@@ -33,12 +34,23 @@ class GameGenerator extends Generator
                 ->values()
                 ->toArray(),
             $this->definition(),
+            $this->ttl(),
         ];
+    }
+
+    public function ttl(): TtlGameDefinition
+    {
+        $ttls = collect($this->generators())
+            ->map(fn (ApiGenerator $generator) => $generator->ttl())
+            ->values()
+            ->toArray();
+
+        return new TtlGameDefinition(game: $this->game, ttls: $ttls);
     }
 
     public function definition(): GameDefinition
     {
-        /** @var ApiDefinition[] $games */
+        /** @var ApiDefinition[] $apis */
         $apis = collect($this->generators())
             ->map(fn (ApiGenerator $generator) => $generator->definition())
             ->values()
@@ -82,7 +94,7 @@ class GameGenerator extends Generator
             ->toArray();
     }
 
-    private function endpointIsValid(string $endpoint): string
+    private function endpointIsValid(string $endpoint): bool
     {
         $parts = explode('/', $endpoint);
 
@@ -90,6 +102,7 @@ class GameGenerator extends Generator
         $position = -1;
 
         foreach ($this->config->games as $game) {
+            /** @phpstan-ignore greater.alwaysTrue */
             if (($search = array_search($game, $parts)) !== false && $search > $position) {
                 $result = $game;
             }

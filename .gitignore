@@ -33,3 +33,4 @@ testbench.yaml
 /.files
 .history
 .DS_Store
+.env

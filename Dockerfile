@@ -16,6 +16,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Disable root warning
 ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV XDEBUG_MODE=coverage
+ENV PHP_MEMORY_LIMIT=1G
+
+RUN echo "memory_limit=1G" > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Set working directory
 WORKDIR /app

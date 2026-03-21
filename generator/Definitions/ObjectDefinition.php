@@ -25,7 +25,7 @@ class ObjectDefinition extends Definition implements Writable
     protected Dumper $dumper;
 
     /**
-     * @param  Closure(string): $this  $resolver
+     * @param  Closure(string): ObjectDefinition  $resolver
      */
     public function __construct(
         public readonly string $key,

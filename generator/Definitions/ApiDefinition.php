@@ -56,7 +56,7 @@ class ApiDefinition extends Definition implements Writable
     {
         /** @var Collection<int, Schema|Reference> $schemas */
         $schemas = collect($this->routes)
-            ->map(fn (ApiRoute $route) => $route->op->responses->getResponse(200))
+            ->map(fn (ApiRoute $route) => $route->op->responses->getResponse('200'))
             ->map(fn (Response $response) => $response->content['application/json']->schema ?? null)
             ->filter()
             ->values();
@@ -99,6 +99,7 @@ class ApiDefinition extends Definition implements Writable
             $this->resolveNamespace('Enums\\Platform'),
             $this->resolveNamespace('Enums\\ValPlatform'),
             ...$imports->toArray(),
+            $this->ttlClassName(),
         ];
     }
 
@@ -126,13 +127,14 @@ class ApiDefinition extends Definition implements Writable
         [$returnType, $collectionType, $returns] = $this->addMethodType($method, $route);
         [$pathParams, $queryParams] = $this->addMethodParameters($method, $route);
         $platformType = $this->addMethodPlatform($method, $route);
+        $this->addMethodForce($method);
 
         $this->addMethodBody($method, $route, $returns, $platformType, $returnType, $collectionType, $pathParams, $queryParams);
 
         return $method;
     }
 
-    protected function addMethodParameters(method $method, ApiRoute $route): array
+    protected function addMethodParameters(Method $method, ApiRoute $route): array
     {
         // add and map the path params
         $pathParams = collect($route->op->parameters)
@@ -170,10 +172,18 @@ class ApiDefinition extends Definition implements Writable
         return [$pathParams, $queryParams];
     }
 
+    protected function addMethodForce(Method $method): void
+    {
+        $method
+            ->addParameter('force')
+            ->setType('bool')
+            ->setDefaultValue(false);
+    }
+
     /**
      * @throws Exception
      */
-    protected function addMethodPlatform(method $method, ApiRoute $route): string
+    protected function addMethodPlatform(Method $method, ApiRoute $route): string
     {
         // add the platform param
         $routeKey = $route->op->getExtensions()['x-route-enum'];
@@ -194,11 +204,11 @@ class ApiDefinition extends Definition implements Writable
     }
 
     /**
-     * @throws array{0: string|null, 1: string|null, 2: bool}
+     * @return array{0: string|null, 1: string|null, 2: bool}
      */
     protected function addMethodType(Method $method, ApiRoute $route): array
     {
-        $response = $route->op->responses->getResponse(200);
+        $response = $route->op->responses->getResponse('200');
         $response = $response->content['application/json']->schema ?? null;
 
         if ($response === null) {
@@ -252,13 +262,12 @@ class ApiDefinition extends Definition implements Writable
         array $queryParams,
     ): void {
         $httpMethod = Str::upper($route->method);
-        $endpoint = Str::replace(['{', '}'], ['$', ''], $route->endpoint);
-
-        $endpoint = Str::replace(array_keys($pathParams), array_values($pathParams), $endpoint);
+        $endpoint = $route->endpoint;
 
         $body = "\$this->fetch(\n";
         $body .= "    method: '$httpMethod',\n";
-        $body .= "    endpoint: \"$endpoint\",\n";
+        $body .= "    endpoint: '$endpoint',\n";
+        $body .= "    cacheKey: {$this->apiName()}Ttl::{$method->getName()},\n";
         $body .= '    returns: '.($returns ? 'true' : 'false').",\n";
         $body .= "    platformType: $platformType::class,\n";
 
@@ -272,6 +281,14 @@ class ApiDefinition extends Definition implements Writable
 
         $body .= "    platform: \$platform,\n";
 
+        if (! empty($pathParams)) {
+            $body .= "    pathParams: [\n";
+            foreach ($pathParams as $name => $value) {
+                $body .= "        '$name' => \$$value,\n";
+            }
+            $body .= "    ],\n";
+        }
+
         if (! empty($queryParams)) {
             $body .= "    query: [\n";
             foreach ($queryParams as $name => $value) {
@@ -279,6 +296,8 @@ class ApiDefinition extends Definition implements Writable
             }
             $body .= "    ],\n";
         }
+
+        $body .= "    force: \$force,\n";
 
         if ($returns) {
             $body = "return $body";
@@ -298,6 +317,13 @@ class ApiDefinition extends Definition implements Writable
         $api = Helpers::formatAttribute($this->api, Helpers::PASCAL_CASE);
 
         return Str::replace($game, '', $api);
+    }
+
+    protected function ttlClassName(): string
+    {
+        $game = Helpers::formatAttribute($this->game, Helpers::PASCAL_CASE);
+
+        return $this->resolveNamespace("Cache\\$game").'\\'.($this->apiName().'Ttl');
     }
 
     protected function resolveReference(string $key): ObjectDefinition

@@ -32,14 +32,21 @@ class FileParser
      */
     public function parse(string $file)
     {
-        $source = Str::isUrl($file) ? 'URL' : 'file';
-        $this->console->writeln("Reading file from $source: $file");
+        $filename = basename($file);
+        $source = Str::isUrl($file) ? 'url' : 'file';
+
+        $this->console->writeln(
+            "  <fg=blue;options=bold>  GET  </>  <fg=white>{$filename}</>  <fg=gray>{$source}</>"
+        );
 
         $content = $this->getContent($file);
-        $this->console->writeln('Parsing file...');
+        $kb = number_format(strlen($content) / 1024, 1);
 
         $object = $this->parseContent($content);
-        $this->console->writeln('File parsed successfully.');
+
+        $this->console->writeln(
+            "  <fg=green>   ✓   </>  <fg=cyan>{$kb} KB</>  <fg=gray>fetched and parsed</>"
+        );
 
         return $object;
     }
@@ -85,13 +92,14 @@ class FileParser
     {
         $finder = new Finder;
 
-        /** @var SplFileInfo|null $file */
-        $file = $finder->path($file)->files()[0];
+        $results = array_values(iterator_to_array($finder->path($file)->files()));
+        /** @var SplFileInfo|null $found */
+        $found = $results[0] ?? null;
 
-        if (empty($file)) {
+        if (empty($found)) {
             throw new Exception("File not found: $file");
         }
 
-        return $file->getContents();
+        return $found->getContents();
     }
 }

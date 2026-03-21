@@ -6,6 +6,7 @@ use Exception;
 use Phizz\Generator\Definitions\ClientDefinition;
 use Phizz\Generator\Definitions\GameDefinition;
 use Phizz\Generator\Definitions\ObjectDefinition;
+use Phizz\Generator\Definitions\TtlRootDefinition;
 
 class ClientGenerator extends Generator
 {
@@ -17,6 +18,11 @@ class ClientGenerator extends Generator
             ->values()
             ->toArray();
 
+        $ttls = collect($this->generators())
+            ->map(fn (GameGenerator $generator) => $generator->ttl())
+            ->values()
+            ->toArray();
+
         return [
             ...collect($this->generators())
                 ->map(fn (GameGenerator $generator) => $generator->definitions())
@@ -25,6 +31,7 @@ class ClientGenerator extends Generator
                 ->values()
                 ->toArray(),
             new ClientDefinition(games: $games),
+            new TtlRootDefinition(games: $ttls),
         ];
     }
 

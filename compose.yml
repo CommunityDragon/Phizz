@@ -1,9 +1,9 @@
 
 services:
   shell:
-    build:
-      context: './docker/8.1'
-      dockerfile: Dockerfile
+    build: .
     volumes:
       - .:/app
     tty: true
+    environment:
+      XDEBUG_MODE: coverage

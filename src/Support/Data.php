@@ -6,27 +6,27 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
-class Data extends Fluent
+/**
+ * @internal
+ */
+abstract class Data extends Fluent
 {
     use Macroable {
         __call as macroCall;
+        __callStatic as macroCallStatic;
     }
 
     /**
      * The attributes that should be cast as objects.
      *
-     * @template T of Data
-     *
-     * @var array<string, class-string<T>>
+     * @var array<string, class-string<Data>>
      */
     protected array $objects = [];
 
     /**
      * The attributes that should be cast as collections.
      *
-     * @template T of Data
-     *
-     * @var array<string, class-string<T>>
+     * @var array<int|string, string>
      */
     protected array $collections = [];
 
@@ -86,7 +86,7 @@ class Data extends Fluent
      */
     public static function __callStatic($method, $parameters)
     {
-        return static::macroCall($method, $parameters);
+        return static::macroCallStatic($method, $parameters);
     }
 
     /**
