@@ -47,7 +47,7 @@ final class Helpers
      * - All-uppercase acronyms are kept as separate tokens.
      * - Digits followed by a single letter (e.g. "20X") stay together.
      * - A leading purely numeric token is spelled out in English words
-     *   (e.g. "12_hello" → "twelve_hello") — requires the intl extension.
+     *   (e.g. "12_hello" -> "twelve_hello") — requires the intl extension.
      *
      * @param  string  $input  Raw attribute name from the OpenAPI schema.
      * @param  string  $case  One of Helpers::SNAKE_CASE, CAMEL_CASE, or PASCAL_CASE.
@@ -108,7 +108,7 @@ final class Helpers
     /**
      * Validates and normalizes a platform value against the expected platform type.
      * Accepts enum instances or string shortcuts (e.g. "na1", "europe"), converts
-     * Platform → Regional where required (e.g. for LoR endpoints), and validates
+     * Platform -> Regional where required (e.g. for LoR endpoints), and validates
      * against any endpoint-specific allow-list before returning the string routing value.
      *
      * @param  string  $platformType  Class-string of the expected routing enum.

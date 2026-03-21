@@ -24,7 +24,7 @@ abstract class Api extends Constructable
      * @param  string|null  $collectionType  Short class name for each item in a collection response.
      * @param  Regional|Platform|ValPlatform|string|null  $platform  Per-request platform override; falls back to instance then config default.
      * @param  array  $platforms  Optional allow-list of valid routing values for this endpoint.
-     * @param  array  $pathParams  Map of placeholder name → value for endpoint template substitution.
+     * @param  array  $pathParams  Map of placeholder name -> value for endpoint template substitution.
      * @param  array  $query  Raw query parameters; blank values are filtered before dispatch.
      * @param  bool  $force  When true, bypasses the cache and always fetches a fresh response.
      * @return mixed Typed object, collection, raw array, or null.

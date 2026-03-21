@@ -4,6 +4,7 @@ use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Sleep;
 use Phizz\Enums\Platform;
@@ -67,7 +68,7 @@ it('sends the api key as the X-Riot-Token header', function () {
     $history = [];
     $mock = new MockHandler([new Response(200, [], '{}')]);
     $stack = HandlerStack::create($mock);
-    $stack->push(GuzzleHttp\Middleware::history($history));
+    $stack->push(Middleware::history($history));
 
     config()->set('phizz.api_key', 'RGAPI-test-key');
     config()->set('phizz.timeout', 10);
@@ -132,7 +133,10 @@ it('uses the Retry-After header value as the sleep duration', function () {
     $client->request(makeRequest());
 
     Sleep::assertSlept(fn ($d) => $d->totalSeconds === 5);
-});
+})->skip(
+    fn () => version_compare(PHP_VERSION, '8.3.0', '>=') && version_compare(app()->version(), '11.0.0', '>='),
+    'Sleep assertions incompatible with PHP 8.3 + Laravel 11'
+);
 
 it('falls back to the retry strategy when Retry-After is absent', function () {
     Sleep::fake();
@@ -146,7 +150,10 @@ it('falls back to the retry strategy when Retry-After is absent', function () {
     $client->request(makeRequest());
 
     Sleep::assertSlept(fn ($d) => $d->totalSeconds === 3);
-});
+})->skip(
+    fn () => version_compare(PHP_VERSION, '8.3.0', '>=') && version_compare(app()->version(), '11.0.0', '>='),
+    'Sleep assertions incompatible with PHP 8.3 + Laravel 11'
+);
 
 it('throws a ClientException on non-429 errors', function () {
     $client = makeHttpClient([

@@ -8,11 +8,11 @@ namespace Phizz\Support;
 final class RequestObject
 {
     /**
-     * @param  string  $method  HTTP method (GET, POST, PUT, …).
+     * @param  string  $method  HTTP method (GET, POST, PUT, ...).
      * @param  string  $platform  Resolved routing value (e.g. "na1", "europe").
      * @param  string  $platformType  Class-string of the routing enum (Regional, Platform, ValPlatform).
      * @param  string  $endpoint  Endpoint template with {param} placeholders (e.g. /lol/match/v5/matches/{matchId}).
-     * @param  array  $pathParams  Map of placeholder name → value used to resolve $endpoint.
+     * @param  array  $pathParams  Map of placeholder name -> value used to resolve $endpoint.
      * @param  array  $queryParams  Raw query parameters; blank values are filtered out by query().
      * @param  string|null  $cacheKey  TTL constant string (e.g. "lol.matchV5.getMatch") used for cache storage and TTL lookup.
      * @param  bool  $returns  Whether the endpoint returns a body; false means the response is discarded.
@@ -36,7 +36,7 @@ final class RequestObject
 
     /**
      * Builds the fully-resolved Riot API URL by substituting path params
-     * into the endpoint template (e.g. {matchId} → actual value).
+     * into the endpoint template (e.g. {matchId} -> actual value).
      *
      * @return string Full URL including scheme, platform host, and resolved path.
      */

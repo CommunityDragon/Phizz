@@ -41,7 +41,7 @@ it('stores the nested object under the camelCase key', function () {
         }
     };
 
-    // nested_item → stored as nestedItem (camelCase)
+    // nested_item -> stored as nestedItem (camelCase)
     expect($data->nestedItem)->toBeInstanceOf($nestedClass::class);
 });
 

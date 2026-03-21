@@ -17,6 +17,11 @@ class PhizzServiceProvider extends PackageServiceProvider
             ->hasConfigFile();
     }
 
+    public function getPackageBaseDir(): string
+    {
+        return dirname(__DIR__);
+    }
+
     public function packageBooted(): void
     {
         $this->app->bind(Phizz::class, function (ApplicationContract $app) {
