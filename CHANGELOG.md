@@ -2,6 +2,10 @@
 
 All notable changes to `phizz` will be documented in this file.
 
+## Load CommunityDragon client directly into Phizz client - 2026-03-22
+
+**Full Changelog**: https://github.com/CommunityDragon/Phizz/compare/v0.3.0...v0.4.0
+
 ## Make data objects castable - 2026-03-22
 
 **Full Changelog**: https://github.com/CommunityDragon/Phizz/compare/v0.2.0...v0.3.0
