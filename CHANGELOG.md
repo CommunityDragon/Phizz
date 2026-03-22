@@ -2,6 +2,10 @@
 
 All notable changes to `phizz` will be documented in this file.
 
+## Generator bugfix - 2026-03-22
+
+**Full Changelog**: https://github.com/CommunityDragon/Phizz/compare/v0.4.0...v0.4.1
+
 ## Load CommunityDragon client directly into Phizz client - 2026-03-22
 
 **Full Changelog**: https://github.com/CommunityDragon/Phizz/compare/v0.3.0...v0.4.0
