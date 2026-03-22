@@ -222,3 +222,84 @@ it('threads version into SkinData nested inside ChampionData', function () {
 
     expect($skin->splashUrl())->toContain('14.3');
 });
+
+// StaticData::castUsing / of
+
+it('castUsing get returns null when value is null', function () {
+    $cast = (new class([], '') extends StaticData {})->castUsing([]);
+
+    expect($cast->get(null, 'field', null, []))->toBeNull();
+});
+
+it('castUsing get deserializes a JSON string and threads the version', function () {
+    $dataClass = new class([], '') extends StaticData
+    {
+        public function getVersion(): string
+        {
+            return $this->version;
+        }
+    };
+
+    $cast = $dataClass::castUsing(['14.5']);
+    $result = $cast->get(null, 'field', json_encode(['id' => 1]), []);
+
+    expect($result)->toBeInstanceOf($dataClass::class)
+        ->and($result->getVersion())->toBe('14.5');
+});
+
+it('castUsing get accepts a plain array', function () {
+    $dataClass = new class([], '') extends StaticData {};
+
+    $cast = $dataClass::castUsing([]);
+    $result = $cast->get(null, 'field', ['id' => 7], []);
+
+    expect($result)->toBeInstanceOf($dataClass::class)
+        ->and($result->id)->toBe(7);
+});
+
+it('castUsing set returns null when value is null', function () {
+    $cast = (new class([], '') extends StaticData {})->castUsing([]);
+
+    expect($cast->set(null, 'field', null, []))->toBeNull();
+});
+
+it('castUsing set JSON-encodes the data instance', function () {
+    $dataClass = new class(['name' => 'Ahri'], '') extends StaticData {};
+    $fqcn = $dataClass::class;
+
+    $cast = $dataClass::castUsing([]);
+    $instance = new $fqcn(['name' => 'Ahri'], '');
+    $json = $cast->set(null, 'field', $instance, []);
+
+    expect(json_decode($json, true))->toBe(['name' => 'Ahri']);
+});
+
+it('of() with version produces cast that threads that version', function () {
+    $dataClass = new class([], '') extends StaticData
+    {
+        public function getVersion(): string
+        {
+            return $this->version;
+        }
+    };
+
+    $cast = $dataClass::of('15.3');
+    $result = $cast->get(null, 'field', json_encode(['id' => 1]), []);
+
+    expect($result->getVersion())->toBe('15.3');
+});
+
+it('of() without arguments defaults version to empty string', function () {
+    $dataClass = new class([], '') extends StaticData
+    {
+        public function getVersion(): string
+        {
+            return $this->version;
+        }
+    };
+
+    $cast = $dataClass::of();
+    $result = $cast->get(null, 'field', json_encode(['id' => 1]), []);
+
+    expect($result->getVersion())->toBe('');
+});

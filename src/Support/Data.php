@@ -2,6 +2,8 @@
 
 namespace Phizz\Support;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
@@ -9,7 +11,7 @@ use Illuminate\Support\Traits\Macroable;
 /**
  * @internal
  */
-abstract class Data extends Fluent
+abstract class Data extends Fluent implements Castable
 {
     use Macroable {
         __call as macroCall;
@@ -29,6 +31,39 @@ abstract class Data extends Fluent
      * @var array<int|string, string>
      */
     protected array $collections = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function castUsing(array $arguments): CastsAttributes
+    {
+        $dataClass = static::class;
+
+        return new class($dataClass) implements CastsAttributes
+        {
+            public function __construct(private readonly string $dataClass) {}
+
+            public function get($model, string $key, mixed $value, array $attributes): mixed
+            {
+                if ($value === null) {
+                    return null;
+                }
+
+                $data = is_string($value) ? json_decode($value, true) : $value;
+
+                return new $this->dataClass($data);
+            }
+
+            public function set($model, string $key, mixed $value, array $attributes): mixed
+            {
+                if ($value === null) {
+                    return null;
+                }
+
+                return json_encode($value instanceof Data ? $value->toArray() : $value);
+            }
+        };
+    }
 
     /**
      * {@inheritdoc}

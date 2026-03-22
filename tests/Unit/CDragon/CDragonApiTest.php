@@ -176,3 +176,35 @@ it('passes the version to a typed return object', function () {
 
     expect($result->getVersion())->toBe('14.2');
 });
+
+it('StaticClient ddragon builds the correct DDragon URL', function () {
+    $history = [];
+    $stack = GuzzleHttp\HandlerStack::create(new GuzzleHttp\Handler\MockHandler([
+        new Response(200, [], json_encode(['15.1.1', '15.1.0'])),
+    ]));
+    $stack->push(GuzzleHttp\Middleware::history($history));
+    $client = new StaticClient(new GuzzleHttp\Client(['handler' => $stack]));
+
+    $result = $client->ddragon('/api/versions.json');
+
+    $url = (string) $history[0]['request']->getUri();
+    expect($url)->toStartWith('https://ddragon.leagueoflegends.com')
+        ->and($result)->toBe(['15.1.1', '15.1.0']);
+});
+
+it('toUrl strips the asset prefix and builds the CDragon URL', function () {
+    $http = makeCDragonHttp([]);
+    $api = new class('14.5', $http) extends StaticApi
+    {
+        public function callToUrl(string $path): string
+        {
+            return $this->toUrl($path);
+        }
+    };
+
+    $url = $api->callToUrl('/lol-game-data/assets/v1/champion-icons/103.png');
+
+    expect($url)->toBe(
+        'https://raw.communitydragon.org/14.5/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/103.png'
+    );
+});

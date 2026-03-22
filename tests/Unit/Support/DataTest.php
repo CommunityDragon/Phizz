@@ -117,3 +117,55 @@ it('supports static macros via __callStatic', function () {
 
     expect($concreteClass::version())->toBe(42);
 });
+
+// castUsing / Castable
+
+it('castUsing get returns null when value is null', function () {
+    $cast = (new class([]) extends Data {})->castUsing([]);
+
+    expect($cast->get(null, 'field', null, []))->toBeNull();
+});
+
+it('castUsing get deserializes a JSON string into a typed instance', function () {
+    $dataClass = new class(['score' => 5]) extends Data {};
+
+    $cast = $dataClass::castUsing([]);
+    $result = $cast->get(null, 'field', json_encode(['score' => 5]), []);
+
+    expect($result)->toBeInstanceOf($dataClass::class)
+        ->and($result->score)->toBe(5);
+});
+
+it('castUsing get accepts a plain array', function () {
+    $dataClass = new class(['x' => 1]) extends Data {};
+
+    $cast = $dataClass::castUsing([]);
+    $result = $cast->get(null, 'field', ['x' => 1], []);
+
+    expect($result)->toBeInstanceOf($dataClass::class)
+        ->and($result->x)->toBe(1);
+});
+
+it('castUsing set returns null when value is null', function () {
+    $cast = (new class([]) extends Data {})->castUsing([]);
+
+    expect($cast->set(null, 'field', null, []))->toBeNull();
+});
+
+it('castUsing set JSON-encodes a Data instance via toArray', function () {
+    $dataClass = new class(['name' => 'Ahri']) extends Data {};
+    $fqcn = $dataClass::class;
+
+    $cast = $dataClass::castUsing([]);
+    $instance = new $fqcn(['name' => 'Ahri']);
+    $json = $cast->set(null, 'field', $instance, []);
+
+    expect(json_decode($json, true))->toBe(['name' => 'Ahri']);
+});
+
+it('castUsing set JSON-encodes a plain array', function () {
+    $cast = (new class([]) extends Data {})->castUsing([]);
+    $json = $cast->set(null, 'field', ['a' => 1], []);
+
+    expect(json_decode($json, true))->toBe(['a' => 1]);
+});
