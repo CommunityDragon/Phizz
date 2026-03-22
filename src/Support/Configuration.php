@@ -50,6 +50,11 @@ final class Configuration
     public readonly Retry $retryStrategy;
 
     /**
+     * CommunityDragon version used when no explicit version is passed to cdragon().
+     */
+    public readonly string $cdragonVersion;
+
+    /**
      * Per-method TTL overrides keyed by TTL constant (e.g. "lol.matchV5.getMatch" => 300).
      *
      * @var array<string, int>
@@ -73,5 +78,6 @@ final class Configuration
         $this->cache = $cache;
         $this->retryStrategy = $config->get('phizz.retry.strategy', Retry::exponential());
         $this->methodTTLs = $config->get('phizz.cache.method', []);
+        $this->cdragonVersion = $config->get('phizz.cdragon.version', 'latest');
     }
 }

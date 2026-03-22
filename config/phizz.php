@@ -147,6 +147,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | CommunityDragon Version
+    |--------------------------------------------------------------------------
+    |
+    | The CDragon patch version used by Phizz::cdragon() when no version is
+    | passed explicitly. Accepts "latest", "pbe", or a patch string like "14.1".
+    |
+    */
+
+    'cdragon' => [
+        'version' => env('CDRAGON_VERSION', 'latest'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Logging
     |--------------------------------------------------------------------------
     |
