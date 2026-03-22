@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -179,11 +180,11 @@ it('passes the version to a typed return object', function () {
 
 it('StaticClient ddragon builds the correct DDragon URL', function () {
     $history = [];
-    $stack = GuzzleHttp\HandlerStack::create(new GuzzleHttp\Handler\MockHandler([
+    $stack = HandlerStack::create(new MockHandler([
         new Response(200, [], json_encode(['15.1.1', '15.1.0'])),
     ]));
-    $stack->push(GuzzleHttp\Middleware::history($history));
-    $client = new StaticClient(new GuzzleHttp\Client(['handler' => $stack]));
+    $stack->push(Middleware::history($history));
+    $client = new StaticClient(new Client(['handler' => $stack]));
 
     $result = $client->ddragon('/api/versions.json');
 
