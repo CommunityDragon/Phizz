@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use Phizz\CDragon\CDragonClient;
 use Phizz\CDragon\Champions\Objects\ChampionData;
@@ -59,7 +60,7 @@ it('squarePortraitUrl returns a reachable HTTPS URL', function () {
 
     expect($url)->toStartWith('https://raw.communitydragon.org');
 
-    $response = (new GuzzleHttp\Client)->head($url);
+    $response = (new Client)->head($url);
     expect($response->getStatusCode())->toBe(200);
 });
 
@@ -69,7 +70,7 @@ it('passive abilityIconUrl returns a reachable HTTPS URL', function () {
 
     expect($url)->toStartWith('https://raw.communitydragon.org');
 
-    $response = (new GuzzleHttp\Client)->head($url);
+    $response = (new Client)->head($url);
     expect($response->getStatusCode())->toBe(200);
 });
 
@@ -79,7 +80,7 @@ it('first spell abilityIconUrl returns a reachable HTTPS URL', function () {
 
     expect($url)->toStartWith('https://raw.communitydragon.org');
 
-    $response = (new GuzzleHttp\Client)->head($url);
+    $response = (new Client)->head($url);
     expect($response->getStatusCode())->toBe(200);
 });
 
@@ -89,7 +90,7 @@ it('base skin splashUrl returns a reachable HTTPS URL', function () {
 
     expect($url)->toStartWith('https://raw.communitydragon.org');
 
-    $response = (new GuzzleHttp\Client)->head($url);
+    $response = (new Client)->head($url);
     expect($response->getStatusCode())->toBe(200);
 });
 
