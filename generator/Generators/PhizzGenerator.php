@@ -3,16 +3,21 @@
 namespace Phizz\Generator\Generators;
 
 use Phizz\Generator\Definitions\ApiDefinition;
+use Phizz\Generator\Definitions\CDragonClientDefinition;
 use Phizz\Generator\Definitions\ClientDefinition;
 use Phizz\Generator\Definitions\Definition;
 use Phizz\Generator\Definitions\EnumDefinition;
 use Phizz\Generator\Definitions\GameDefinition;
 use Phizz\Generator\Definitions\ObjectDefinition;
 use Phizz\Generator\Definitions\RouteDefinition;
+use Phizz\Generator\Definitions\StaticDataDefinition;
+use Phizz\Generator\Definitions\StaticGameClientDefinition;
 use Phizz\Generator\Definitions\TtlDefinition;
 use Phizz\Generator\Definitions\TtlGameDefinition;
 use Phizz\Generator\Definitions\TtlRootDefinition;
 use Phizz\Generator\Interfaces\Writable;
+use Phizz\Generator\Parsers\CDragonParser;
+use Symfony\Component\Filesystem\Filesystem;
 
 class PhizzGenerator extends Generator
 {
@@ -22,12 +27,15 @@ class PhizzGenerator extends Generator
             ...(new RouteGenerator(config: $this->config))->definitions(),
             ...(new EnumGenerator(config: $this->config))->definitions(),
             ...(new ClientGenerator(config: $this->config))->definitions(),
+            ...$this->cdragonDefinitions(),
         ];
     }
 
     public function generate(): void
     {
         $console = $this->config->console;
+
+        $this->wipeCDragon();
 
         $definitions = collect($this->definitions())
             ->filter(fn (Definition $definition) => $definition instanceof Writable)
@@ -76,6 +84,74 @@ class PhizzGenerator extends Generator
     }
 
     /**
+     * @return Definition[]
+     */
+    private function cdragonDefinitions(): array
+    {
+        $version = $this->config->cdragonVersion; // 'latest' by default
+        $console = $this->config->console;
+
+        $console->writeln('');
+        $console->writeln('  <bg=blue;fg=white;options=bold>  INSPECT  </>  Fetching CommunityDragon schema...');
+        $console->writeln('');
+
+        $parser = new CDragonParser($version, $console);
+        $endpoints = $parser->inspect();
+
+        $console->writeln('');
+        $console->writeln('  Found <fg=cyan>'.count($endpoints).'</> endpoints.');
+
+        $dataDefinitions = [];
+        $lolEndpoints = [];
+        $lolData = [];
+        $tftEndpoints = [];
+        $tftData = [];
+
+        foreach ($endpoints as $endpoint) {
+            $data = new StaticDataDefinition($endpoint);
+            $dataDefinitions[] = $data;
+
+            foreach ($data->nestedDefinitions() as $nested) {
+                $dataDefinitions[] = $nested;
+            }
+
+            if (str_starts_with(strtolower($endpoint->slug), 'tft')) {
+                $tftEndpoints[] = $endpoint;
+                $tftData[] = $data;
+            } else {
+                $lolEndpoints[] = $endpoint;
+                $lolData[] = $data;
+            }
+        }
+
+        $lolClientDef = new StaticGameClientDefinition('lol', $lolEndpoints, $lolData);
+        $tftClientDef = new StaticGameClientDefinition('tft', $tftEndpoints, $tftData);
+
+        return [...$dataDefinitions, $lolClientDef, $tftClientDef, new CDragonClientDefinition];
+    }
+
+    private function wipeCDragon(): void
+    {
+        $srcPath = __DIR__.'/../../src/CDragon';
+        $filesystem = new Filesystem;
+
+        if (! is_dir($srcPath)) {
+            return;
+        }
+
+        foreach (new \DirectoryIterator($srcPath) as $item) {
+            if ($item->isDot() || ! $item->isDir()) {
+                continue;
+            }
+            $filesystem->remove($item->getPathname());
+        }
+
+        $filesystem->remove($srcPath.'/CDragonClient.php');
+        $filesystem->remove($srcPath.'/LolClient.php');
+        $filesystem->remove($srcPath.'/TftClient.php');
+    }
+
+    /**
      * @return array{0: string, 1: string}
      */
     private function groupFor(Definition $definition): array
@@ -98,6 +174,10 @@ class PhizzGenerator extends Generator
 
         if ($definition instanceof ApiDefinition || $definition instanceof ObjectDefinition) {
             return $this->gameGroup($this->gameFromNamespace($definition->namespace()));
+        }
+
+        if ($definition instanceof StaticDataDefinition || $definition instanceof CDragonClientDefinition || $definition instanceof StaticGameClientDefinition) {
+            return ['CDragon', 'cyan'];
         }
 
         return ['Other', 'gray'];
@@ -144,6 +224,9 @@ class PhizzGenerator extends Generator
             $definition instanceof TtlRootDefinition => 'magenta',
             $definition instanceof GameDefinition,
             $definition instanceof ClientDefinition => 'blue',
+            $definition instanceof StaticDataDefinition => 'white',
+            $definition instanceof StaticGameClientDefinition,
+            $definition instanceof CDragonClientDefinition => 'blue',
             default => 'gray',
         };
     }

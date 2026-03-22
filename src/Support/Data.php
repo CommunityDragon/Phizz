@@ -42,7 +42,7 @@ abstract class Data extends Fluent
 
             if (array_key_exists($key, $this->collections)) {
                 $attrs[Helpers::formatAttribute($key, Helpers::CAMEL_CASE)] = collect($value)
-                    ->map(fn ($item) => new $this->collections[$key]($item));
+                    ->map(fn ($item) => $this->makeObject($this->collections[$key], $item));
 
                 continue;
             }
@@ -54,7 +54,7 @@ abstract class Data extends Fluent
             }
 
             if (array_key_exists($key, $this->objects)) {
-                $attrs[Helpers::formatAttribute($key, Helpers::CAMEL_CASE)] = new $this->objects[$key]($value);
+                $attrs[Helpers::formatAttribute($key, Helpers::CAMEL_CASE)] = $this->makeObject($this->objects[$key], $value);
 
                 continue;
             }
@@ -63,6 +63,14 @@ abstract class Data extends Fluent
         }
 
         parent::__construct($attrs);
+    }
+
+    /**
+     * Instantiates the nested object.
+     */
+    protected function makeObject(string $class, mixed $value): Data
+    {
+        return new $class($value);
     }
 
     /**

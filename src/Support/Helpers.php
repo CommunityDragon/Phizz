@@ -145,6 +145,19 @@ final class Helpers
     }
 
     /**
+     * Converts a CommunityDragon asset path to a full URL.
+     *
+     * @param  string  $path  Raw CommunityDragon asset path (e.g. /lol-game-data/assets/v1/...).
+     * @return string Fully qualified CommunityDragon asset URL.
+     */
+    public static function toStaticUrl(string $version, string $path): string
+    {
+        $path = str_ireplace(StaticClient::ASSET_PREFIX, '', $path);
+
+        return StaticClient::CDRAGON_BASE."/$version/".StaticClient::PLUGIN_BASE.'/'.ltrim(strtolower($path), '/');
+    }
+
+    /**
      * Maps a raw decoded response body to the requested return type.
      * Returns null when the endpoint declares no return value, instantiates
      * a typed object or a Collection of typed objects when specified, or

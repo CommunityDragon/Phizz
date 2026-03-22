@@ -69,38 +69,38 @@ $application->add(new Command("generate"))
         description: "RiotAPI queue types file path/url",
         default: "https://www.mingweisamuel.com/riotapi-schema/enums/queueTypes.json"
     )
+    ->addOption(
+        name: "cdragon-version",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "CommunityDragon version to inspect (latest, pbe, or a patch like 14.1)",
+        default: 'latest',
+    )
     ->setCode(function (InputInterface $input, OutputInterface $output): int {
         $start = microtime(true);
 
         $output->writeln('');
-        $output->writeln('  <fg=cyan;options=bold>Phizz</> <fg=gray>· Riot Games API Generator</>');
+        $output->writeln('  <fg=cyan;options=bold>Phizz</> <fg=gray>· API Generator</>');
         $output->writeln('');
         $output->writeln('  <bg=blue;fg=white;options=bold>  FETCH  </>  Fetching schema files...');
         $output->writeln('');
 
-        // create the parsers
         $fp = new FileParser(console: $output);
         $sp = new SchemaParser(console: $output);
 
-        // create the generator
-        $generator = new PhizzGenerator(
-            config: new Configuration(
-                console: $output,
-                schema: $sp->parse(file: $input->getOption("schema")),
-                routes: $fp->parse(file: $input->getOption("routes")),
-                enums: [
-                    'season' => $fp->parse(file: $input->getOption("seasons")),
-                    'queue' => $fp->parse(file: $input->getOption("queues")),
-                    'map' => $fp->parse(file: $input->getOption("maps")),
-                    'gameMode' => $fp->parse(file: $input->getOption("game-modes")),
-                    'gameType' => $fp->parse(file: $input->getOption("game-types")),
-                    'queueType' => $fp->parse(file: $input->getOption("queue-types")),
-                ]
-            )
-        );
-
-        // generate the code
-        $generator->generate();
+        (new PhizzGenerator(config: new Configuration(
+            console: $output,
+            schema: $sp->parse(file: $input->getOption("schema")),
+            routes: $fp->parse(file: $input->getOption("routes")),
+            enums: [
+                'season' => $fp->parse(file: $input->getOption("seasons")),
+                'queue' => $fp->parse(file: $input->getOption("queues")),
+                'map' => $fp->parse(file: $input->getOption("maps")),
+                'gameMode' => $fp->parse(file: $input->getOption("game-modes")),
+                'gameType' => $fp->parse(file: $input->getOption("game-types")),
+                'queueType' => $fp->parse(file: $input->getOption("queue-types")),
+            ],
+            cdragonVersion: $input->getOption("cdragon-version") ?? 'latest',
+        )))->generate();
 
         $elapsed = number_format(microtime(true) - $start, 2);
         $output->writeln('');

@@ -21,7 +21,8 @@ class Configuration
         public readonly OutputInterface $console,
         public readonly OpenApi $schema,
         public readonly array $routes,
-        public readonly array $enums
+        public readonly array $enums,
+        public readonly string $cdragonVersion = 'latest',
     ) {
         $this->games = $this->resolveGames();
     }
