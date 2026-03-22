@@ -94,7 +94,7 @@ class StaticGameClientDefinition extends Definition implements Writable
             $data = $this->dataDefinitions[$i];
             $imports[] = $data->className();
 
-            if (! $endpoint->isDirectory) {
+            if (! $endpoint->isDirectory && $endpoint->isArray) {
                 $hasCollection = true;
             }
         }
@@ -118,8 +118,8 @@ class StaticGameClientDefinition extends Definition implements Writable
             $dataShort = GeneratorHelpers::extractShortName($data->className());
             $methodName = $this->resolveMethodName($endpoint->slug);
 
-            if ($endpoint->isDirectory) {
-                $this->buildDirectoryMethod($class, $endpoint, $dataShort, $methodName, $data->className());
+            if ($endpoint->isDirectory || ! $endpoint->isArray) {
+                $this->buildObjectMethod($class, $endpoint, $dataShort, $methodName, $data->className());
             } elseif ($endpoint->idField !== null) {
                 $this->buildFlatWithIdMethod($class, $endpoint, $dataShort, $methodName, $data->className());
             } else {
@@ -141,15 +141,22 @@ class StaticGameClientDefinition extends Definition implements Writable
         return Helpers::formatAttribute($mapped, Helpers::CAMEL_CASE);
     }
 
-    private function buildDirectoryMethod(ClassType $class, CDragonEndpoint $endpoint, string $dataShort, string $methodName, string $dataFqcn): void
+    private function buildObjectMethod(ClassType $class, CDragonEndpoint $endpoint, string $dataShort, string $methodName, string $dataFqcn): void
     {
         $method = $class->addMethod($methodName)
             ->setReturnType($dataFqcn)
             ->addComment("@return $dataShort");
-        $method->addParameter('id')->setType('int');
+
+        if ($endpoint->isDirectory) {
+            $method->addParameter('id')->setType('int');
+            $path = '"/v1/'.$endpoint->slug.'/{$id}.json"';
+        } else {
+            $path = '"/v1/'.$endpoint->slug.'.json"';
+        }
+
         $method->setBody(
             'return $this->fetch('."\n".
-            '    "/v1/'.$endpoint->slug.'/{$id}.json",'."\n".
+            '    '.$path.','."\n".
             '    returnType: '.$dataShort.'::class,'."\n".
             ');'
         );

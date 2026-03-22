@@ -42,14 +42,11 @@ class TftClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, TftchampionsTeamplannerData>
-     */
-    public function championsTeamplanner(): Collection
+    public function championsTeamplanner(): TftchampionsTeamplannerData
     {
         return $this->fetch(
             '/v1/tftchampions-teamplanner.json',
-            collectionType: TftchampionsTeamplannerData::class,
+            returnType: TftchampionsTeamplannerData::class,
         );
     }
 
@@ -86,14 +83,11 @@ class TftClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, TftcosmeticsdefaultData>
-     */
-    public function cosmeticsDefault(): Collection
+    public function cosmeticsDefault(): TftcosmeticsdefaultData
     {
         return $this->fetch(
             '/v1/tftcosmeticsdefault.json',
-            collectionType: TftcosmeticsdefaultData::class,
+            returnType: TftcosmeticsdefaultData::class,
         );
     }
 
@@ -165,14 +159,11 @@ class TftClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, TftpasswelcomedatumData>
-     */
-    public function passWelcomeData(): Collection
+    public function passWelcomeData(): TftpasswelcomedatumData
     {
         return $this->fetch(
             '/v1/tftpasswelcomedata.json',
-            collectionType: TftpasswelcomedatumData::class,
+            returnType: TftpasswelcomedatumData::class,
         );
     }
 
@@ -209,14 +200,11 @@ class TftClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, TftsetData>
-     */
-    public function sets(): Collection
+    public function sets(): TftsetData
     {
         return $this->fetch(
             '/v1/tftsets.json',
-            collectionType: TftsetData::class,
+            returnType: TftsetData::class,
         );
     }
 

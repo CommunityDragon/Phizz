@@ -87,14 +87,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, ChallengeData>
-     */
-    public function challenges(): Collection
+    public function challenges(): ChallengeData
     {
         return $this->fetch(
             '/v1/challenges.json',
-            collectionType: ChallengeData::class,
+            returnType: ChallengeData::class,
         );
     }
 
@@ -157,14 +154,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, ClashVoData>
-     */
-    public function clashVo(): Collection
+    public function clashVo(): ClashVoData
     {
         return $this->fetch(
             '/v1/clash-vo.json',
-            collectionType: ClashVoData::class,
+            returnType: ClashVoData::class,
         );
     }
 
@@ -190,14 +184,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, DiscordStringData>
-     */
-    public function discordStrings(): Collection
+    public function discordStrings(): DiscordStringData
     {
         return $this->fetch(
             '/v1/discord_strings.json',
-            collectionType: DiscordStringData::class,
+            returnType: DiscordStringData::class,
         );
     }
 
@@ -234,14 +225,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, GenericAssetData>
-     */
-    public function genericAssets(): Collection
+    public function genericAssets(): GenericAssetData
     {
         return $this->fetch(
             '/v1/generic-assets.json',
-            collectionType: GenericAssetData::class,
+            returnType: GenericAssetData::class,
         );
     }
 
@@ -324,14 +312,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, LootData>
-     */
-    public function loot(): Collection
+    public function loot(): LootData
     {
         return $this->fetch(
             '/v1/loot.json',
-            collectionType: LootData::class,
+            returnType: LootData::class,
         );
     }
 
@@ -392,14 +377,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, NumberFormattingDatumData>
-     */
-    public function numberFormattingData(): Collection
+    public function numberFormattingData(): NumberFormattingDatumData
     {
         return $this->fetch(
             '/v1/number-formatting-data.json',
-            collectionType: NumberFormattingDatumData::class,
+            returnType: NumberFormattingDatumData::class,
         );
     }
 
@@ -438,14 +420,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, PerkstyleData>
-     */
-    public function perkstyles(): Collection
+    public function perkstyles(): PerkstyleData
     {
         return $this->fetch(
             '/v1/perkstyles.json',
-            collectionType: PerkstyleData::class,
+            returnType: PerkstyleData::class,
         );
     }
 
@@ -497,14 +476,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, SettingstopersistData>
-     */
-    public function settingsToPersist(): Collection
+    public function settingsToPersist(): SettingstopersistData
     {
         return $this->fetch(
             '/v1/settingstopersist.json',
-            collectionType: SettingstopersistData::class,
+            returnType: SettingstopersistData::class,
         );
     }
 
@@ -543,14 +519,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, StatstoneData>
-     */
-    public function statStones(): Collection
+    public function statStones(): StatstoneData
     {
         return $this->fetch(
             '/v1/statstones.json',
-            collectionType: StatstoneData::class,
+            returnType: StatstoneData::class,
         );
     }
 
@@ -565,36 +538,27 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, StylesheetTeamplannerData>
-     */
-    public function stylesheetTeamplanner(): Collection
+    public function stylesheetTeamplanner(): StylesheetTeamplannerData
     {
         return $this->fetch(
             '/v1/stylesheet-teamplanner.json',
-            collectionType: StylesheetTeamplannerData::class,
+            returnType: StylesheetTeamplannerData::class,
         );
     }
 
-    /**
-     * @return Collection<int, StylesheetData>
-     */
-    public function stylesheet(): Collection
+    public function stylesheet(): StylesheetData
     {
         return $this->fetch(
             '/v1/stylesheet.json',
-            collectionType: StylesheetData::class,
+            returnType: StylesheetData::class,
         );
     }
 
-    /**
-     * @return Collection<int, SummonerBannerData>
-     */
-    public function summonerBanners(): Collection
+    public function summonerBanners(): SummonerBannerData
     {
         return $this->fetch(
             '/v1/summoner-banners.json',
-            collectionType: SummonerBannerData::class,
+            returnType: SummonerBannerData::class,
         );
     }
 
@@ -650,14 +614,11 @@ class LolClient extends StaticApi
         );
     }
 
-    /**
-     * @return Collection<int, SummonerTrophyData>
-     */
-    public function summonerTrophies(): Collection
+    public function summonerTrophies(): SummonerTrophyData
     {
         return $this->fetch(
             '/v1/summoner-trophies.json',
-            collectionType: SummonerTrophyData::class,
+            returnType: SummonerTrophyData::class,
         );
     }
 
