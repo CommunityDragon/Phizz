@@ -5,6 +5,7 @@
 namespace Phizz\Generator\Definitions;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Helpers as GeneratorHelpers;
 use Phizz\Generator\Interfaces\Writable;
@@ -77,12 +78,12 @@ class StaticGameClientDefinition extends Definition implements Writable
 
     public function namespace(): string
     {
-        return $this->resolveNamespace('CDragon');
+        return $this->resolveNamespace('Assets\\'.ucfirst($this->game));
     }
 
     public function directory(): string
     {
-        return $this->resolvePath('CDragon');
+        return $this->resolvePath('Assets/'.ucfirst($this->game));
     }
 
     public function imports(): array
@@ -132,20 +133,30 @@ class StaticGameClientDefinition extends Definition implements Writable
 
     private function resolveMethodName(string $slug): string
     {
+        return Helpers::formatAttribute(self::resolveSlugStem($slug, $this->game), Helpers::CAMEL_CASE);
+    }
+
+    /**
+     * Applies alias mapping and strips the game prefix from a slug, returning
+     * a StudlyCase stem suitable for directory/namespace generation.
+     */
+    public static function resolveSlugStem(string $slug, string $game): string
+    {
         $mapped = self::SLUG_ALIASES[strtolower($slug)] ?? $slug;
 
-        if (str_starts_with(strtolower($mapped), $this->game)) {
-            $mapped = lcfirst(substr($mapped, strlen($this->game)));
+        if (str_starts_with(strtolower($mapped), strtolower($game))) {
+            $mapped = substr($mapped, strlen($game));
         }
 
-        return Helpers::formatAttribute($mapped, Helpers::CAMEL_CASE);
+        return Str::studly($mapped);
     }
 
     private function buildObjectMethod(ClassType $class, CDragonEndpoint $endpoint, string $dataShort, string $methodName, string $dataFqcn): void
     {
         $method = $class->addMethod($methodName)
             ->setReturnType($dataFqcn)
-            ->addComment("@return $dataShort");
+            ->setReturnNullable()
+            ->addComment("@return $dataShort|null");
 
         if ($endpoint->isDirectory) {
             $method->addParameter('id')->setType('int');
@@ -167,7 +178,8 @@ class StaticGameClientDefinition extends Definition implements Writable
         $idField = $endpoint->idField;
         $method = $class->addMethod($methodName)
             ->setReturnType(Collection::class.'|'.$dataFqcn)
-            ->addComment("@return Collection<int, $dataShort>|$dataShort");
+            ->setReturnNullable()
+            ->addComment("@return Collection<int, $dataShort>|$dataShort|null");
         $method->addParameter('id')->setType('?int')->setDefaultValue(null);
         $method->setBody(
             'return $this->fetch('."\n".

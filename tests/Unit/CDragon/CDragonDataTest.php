@@ -1,10 +1,13 @@
 <?php
 
-use Phizz\CDragon\Champions\Objects\ChampionData;
-use Phizz\CDragon\Champions\Objects\PassiveData;
-use Phizz\CDragon\Champions\Objects\SkinData;
-use Phizz\CDragon\Champions\Objects\SpellData;
+use Phizz\Assets\Lol\Champions\Objects\ChampionData;
+use Phizz\Assets\Lol\Champions\Objects\PassiveData;
+use Phizz\Assets\Lol\Champions\Objects\SkinData;
+use Phizz\Assets\Lol\Champions\Objects\SpellData;
+use Phizz\Support\StaticApi;
 use Phizz\Support\StaticData;
+
+beforeEach(fn () => StaticApi::clearCache());
 
 it('stores camelCase attributes as snake_case', function () {
     $data = new class(['squarePortraitPath' => '/lol-game-data/assets/v1/foo.png'], 'latest') extends StaticData {};

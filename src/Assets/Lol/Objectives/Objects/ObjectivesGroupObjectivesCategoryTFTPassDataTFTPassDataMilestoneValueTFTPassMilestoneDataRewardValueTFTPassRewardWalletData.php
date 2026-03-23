@@ -1,0 +1,16 @@
+<?php
+
+namespace Phizz\Assets\Lol\Objectives\Objects;
+
+use Phizz\Support\StaticData;
+
+/**
+ * @property-read int $quantity
+ * @property-read bool $is_premium
+ * @property-read string $name_tra_key_override
+ * @property-read string $description_tra_key_override
+ * @property-read string $reward_asset
+ * @property-read string $type
+ * @property-read string $currency
+ */
+class ObjectivesGroupObjectivesCategoryTFTPassDataTFTPassDataMilestoneValueTFTPassMilestoneDataRewardValueTFTPassRewardWalletData extends StaticData {}

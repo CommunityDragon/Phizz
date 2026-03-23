@@ -8,6 +8,7 @@ use Phizz\Generator\Generators\PhizzGenerator;
 use Phizz\Generator\Objects\Configuration;
 use Phizz\Generator\Parsers\FileParser;
 use Phizz\Generator\Parsers\SchemaParser;
+use Phizz\Generator\Parsers\StaticParser;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +27,12 @@ $application->add(new Command("generate"))
         mode: InputOption::VALUE_REQUIRED,
         description: "RiotAPI schema file path/url",
         default: "https://www.mingweisamuel.com/riotapi-schema/openapi-3.0.0.json"
+    )
+    ->addOption(
+        name: "patch",
+        mode: InputOption::VALUE_REQUIRED,
+        description: "CommunityDragon version to inspect (latest, pbe, or a patch like 14.1)",
+        default: 'latest',
     )
     ->addOption(
         name: "routes",
@@ -69,44 +76,65 @@ $application->add(new Command("generate"))
         description: "RiotAPI queue types file path/url",
         default: "https://www.mingweisamuel.com/riotapi-schema/enums/queueTypes.json"
     )
-    ->addOption(
-        name: "cdragon-version",
-        mode: InputOption::VALUE_REQUIRED,
-        description: "CommunityDragon version to inspect (latest, pbe, or a patch like 14.1)",
-        default: 'latest',
-    )
     ->setCode(function (InputInterface $input, OutputInterface $output): int {
+        // function timer
         $start = microtime(true);
 
+        // opening log
         $output->writeln('');
         $output->writeln('  <fg=cyan;options=bold>Phizz</> <fg=gray>· API Generator</>');
         $output->writeln('');
-        $output->writeln('  <bg=blue;fg=white;options=bold>  FETCH  </>  Fetching schema files...');
+
+        // fetching the schema file
+        $output->writeln('  <bg=blue;fg=white;options=bold>  FETCH  </>  Fetching schema file...');
+        $output->writeln('');
+
+        $sp = new SchemaParser(console: $output);
+        $schema = $sp->parse(entry: $input->getOption("schema"));
+
+        // fetching routes and constants
+        $output->writeln('  <bg=blue;fg=white;options=bold>  FETCH  </>  Fetching routes and constants...');
         $output->writeln('');
 
         $fp = new FileParser(console: $output);
-        $sp = new SchemaParser(console: $output);
+        $routes = $fp->parse(entry: $input->getOption("routes"));
+        $season = $fp->parse(entry: $input->getOption("seasons"));
+        $queue = $fp->parse(entry: $input->getOption("queues"));
+        $map = $fp->parse(entry: $input->getOption("maps"));
+        $gameMode = $fp->parse(entry: $input->getOption("game-modes"));
+        $gameType = $fp->parse(entry: $input->getOption("game-types"));
+        $queueType = $fp->parse(entry: $input->getOption("queue-types"));
 
+        // fetching cdragon endpoints
+        $output->writeln('  <bg=blue;fg=white;options=bold>  FETCH  </>  Fetching CommunityDragon endpoints...');
+        $output->writeln('');
+
+        $dp = new StaticParser(console: $output);
+        $endpoints = $dp->parse(entry: $input->getOption("patch"));
+
+        // generate the code
         (new PhizzGenerator(config: new Configuration(
             console: $output,
-            schema: $sp->parse(file: $input->getOption("schema")),
-            routes: $fp->parse(file: $input->getOption("routes")),
+            schema: $schema,
+            endpoints: $endpoints,
+            routes: $routes,
             enums: [
-                'season' => $fp->parse(file: $input->getOption("seasons")),
-                'queue' => $fp->parse(file: $input->getOption("queues")),
-                'map' => $fp->parse(file: $input->getOption("maps")),
-                'gameMode' => $fp->parse(file: $input->getOption("game-modes")),
-                'gameType' => $fp->parse(file: $input->getOption("game-types")),
-                'queueType' => $fp->parse(file: $input->getOption("queue-types")),
+                'season' => $season,
+                'queue' => $queue,
+                'map' => $map,
+                'gameMode' => $gameMode,
+                'gameType' => $gameType,
+                'queueType' => $queueType,
             ],
-            cdragonVersion: $input->getOption("cdragon-version") ?? 'latest',
         )))->generate();
 
+        // log elapsed time
         $elapsed = number_format(microtime(true) - $start, 2);
         $output->writeln('');
         $output->writeln("  <bg=green;fg=black;options=bold>  DONE  </>  All files generated  <fg=gray>·</>  <fg=cyan>{$elapsed}s</>");
         $output->writeln('');
 
+        // return success
         return Command::SUCCESS;
     });
 

@@ -2,8 +2,6 @@
 
 namespace Phizz\Support;
 
-use InvalidArgumentException;
-
 /**
  * @internal
  */
@@ -13,7 +11,7 @@ abstract class StaticApi
 
     protected const ASSET_PREFIX = '/lol-game-data/assets';
 
-    private array $cache = [];
+    private static array $cache = [];
 
     public function __construct(
         protected readonly string $version,
@@ -38,9 +36,8 @@ abstract class StaticApi
         ?string $idField = null,
         ?int $id = null,
     ): mixed {
-        $data = $this->cache[$path] ??= $this->http->cdragon(
-            "/{$this->version}/".self::PLUGIN_BASE.$path
-        );
+        $url = "/{$this->version}/".self::PLUGIN_BASE.$path;
+        $data = self::$cache[$url] ??= $this->http->cdragon($url);
 
         if ($returnType !== null) {
             return new $returnType($data, $this->version);
@@ -50,7 +47,7 @@ abstract class StaticApi
             $item = collect($data)->firstWhere($idField, $id);
 
             if ($item === null) {
-                throw new InvalidArgumentException("Item '{$id}' not found.");
+                return null;
             }
 
             return new $collectionType($item, $this->version);
@@ -61,6 +58,11 @@ abstract class StaticApi
         }
 
         return $data;
+    }
+
+    public static function clearCache(): void
+    {
+        self::$cache = [];
     }
 
     protected function toUrl(string $path): string

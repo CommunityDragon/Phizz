@@ -30,6 +30,7 @@ class StaticDataDefinition extends Definition implements Writable
      * @param  string|null  $fieldName  When set, overrides class name derivation (used for nested definitions).
      * @param  string  $classPrefix  Prepended to the short class name to avoid collisions in deep nesting.
      * @param  bool  $singularize  When true, singularizes the field name for the class name (used for list fields).
+     * @param  string  $game  'lol' or 'tft' — determines the Assets sub-namespace.
      */
     public function __construct(
         private readonly CDragonEndpoint $endpoint,
@@ -37,20 +38,23 @@ class StaticDataDefinition extends Definition implements Writable
         private readonly ?string $fieldName = null,
         private readonly string $classPrefix = '',
         private readonly bool $singularize = false,
+        private readonly string $game = 'lol',
     ) {}
 
     public function namespace(): string
     {
         $slug = $this->parentSlug ?? $this->endpoint->slug;
+        $stem = StaticGameClientDefinition::resolveSlugStem($slug, $this->game);
 
-        return $this->resolveNamespace('CDragon\\'.Str::studly($slug).'\\Objects');
+        return $this->resolveNamespace('Assets\\'.ucfirst($this->game).'\\'.$stem.'\\Objects');
     }
 
     public function directory(): string
     {
         $slug = $this->parentSlug ?? $this->endpoint->slug;
+        $stem = StaticGameClientDefinition::resolveSlugStem($slug, $this->game);
 
-        return $this->resolvePath('CDragon/'.Str::studly($slug).'/Objects');
+        return $this->resolvePath('Assets/'.ucfirst($this->game).'/'.$stem.'/Objects');
     }
 
     public function imports(): array
@@ -159,7 +163,7 @@ class StaticDataDefinition extends Definition implements Writable
                 fields: $field->subFields,
             );
 
-            $def = new StaticDataDefinition($subEndpoint, $parentSlug, $field->name, $this->childClassPrefix(), $singularize);
+            $def = new StaticDataDefinition($subEndpoint, $parentSlug, $field->name, $this->childClassPrefix(), $singularize, $this->game);
             $nested[] = $def;
 
             foreach ($def->nestedDefinitions() as $deepNested) {
@@ -180,7 +184,9 @@ class StaticDataDefinition extends Definition implements Writable
             return $this->classPrefix.$base.'Data';
         }
 
-        return Str::studly(Str::singular($this->endpoint->slug)).'Data';
+        $stem = StaticGameClientDefinition::resolveSlugStem($this->endpoint->slug, $this->game);
+
+        return Str::singular($stem).'Data';
     }
 
     /**
@@ -227,7 +233,8 @@ class StaticDataDefinition extends Definition implements Writable
     private function nestedFqcn(string $fieldName, bool $singularize): string
     {
         $slug = $this->parentSlug ?? $this->endpoint->slug;
-        $ns = $this->resolveNamespace('CDragon\\'.Str::studly($slug).'\\Objects');
+        $stem = StaticGameClientDefinition::resolveSlugStem($slug, $this->game);
+        $ns = $this->resolveNamespace('Assets\\'.ucfirst($this->game).'\\'.$stem.'\\Objects');
         $base = $singularize ? Str::studly(Str::singular($fieldName)) : Str::studly($fieldName);
         $cn = $this->childClassPrefix().$base.'Data';
 

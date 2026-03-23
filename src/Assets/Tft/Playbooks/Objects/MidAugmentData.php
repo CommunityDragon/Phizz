@@ -1,0 +1,18 @@
+<?php
+
+namespace Phizz\Assets\Tft\Playbooks\Objects;
+
+use Phizz\Support\StaticData;
+
+/**
+ * @property-read string $name
+ * @property-read string $description
+ * @property-read string $icon_path
+ */
+class MidAugmentData extends StaticData
+{
+    public function iconUrl(): string
+    {
+        return $this->toUrl($this->icon_path);
+    }
+}

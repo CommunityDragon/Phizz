@@ -2,16 +2,16 @@
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
-use Phizz\CDragon\CDragonClient;
-use Phizz\CDragon\Champions\Objects\ChampionData;
-use Phizz\CDragon\Champions\Objects\PassiveData;
-use Phizz\CDragon\Champions\Objects\SkinData;
-use Phizz\CDragon\Champions\Objects\SpellData;
+use Phizz\Assets\AssetClient;
+use Phizz\Assets\Lol\Champions\Objects\ChampionData;
+use Phizz\Assets\Lol\Champions\Objects\PassiveData;
+use Phizz\Assets\Lol\Champions\Objects\SkinData;
+use Phizz\Assets\Lol\Champions\Objects\SpellData;
 use Phizz\Support\StaticClient;
 
-function makeCDragonClient(string $version = 'latest'): CDragonClient
+function makeCDragonClient(string $version = 'latest'): AssetClient
 {
-    return new CDragonClient($version, new StaticClient);
+    return new AssetClient($version, new StaticClient);
 }
 
 it('returns a ChampionData for Ahri (id=103)', function () {

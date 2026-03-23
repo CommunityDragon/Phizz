@@ -9,7 +9,7 @@ use Phizz\Support\StaticApi;
 use Phizz\Support\StaticClient;
 
 /**
- * Generates CDragonClient — a thin wrapper that exposes $lol and $tft sub-clients.
+ * Generates AssetClient — a thin wrapper that exposes $lol and $tft sub-clients.
  *
  * @extends Definition<ClassType>
  */
@@ -19,12 +19,12 @@ class CDragonClientDefinition extends Definition implements Writable
 
     public function namespace(): string
     {
-        return $this->resolveNamespace('CDragon');
+        return $this->resolveNamespace('Assets');
     }
 
     public function directory(): string
     {
-        return $this->resolvePath('CDragon');
+        return $this->resolvePath('Assets');
     }
 
     public function imports(): array
@@ -32,21 +32,23 @@ class CDragonClientDefinition extends Definition implements Writable
         return [
             StaticApi::class,
             StaticClient::class,
+            $this->resolveNamespace('Assets\\Lol').'\\LolClient',
+            $this->resolveNamespace('Assets\\Tft').'\\TftClient',
         ];
     }
 
     public function definition(): ClassType
     {
-        $class = (new ClassType('CDragonClient'))
+        $class = (new ClassType('AssetClient'))
             ->setExtends(StaticApi::class);
 
         $class->addProperty('lol')
-            ->setType($this->resolveNamespace('CDragon').'\\LolClient')
+            ->setType($this->resolveNamespace('Assets\\Lol').'\\LolClient')
             ->setPublic()
             ->setReadOnly();
 
         $class->addProperty('tft')
-            ->setType($this->resolveNamespace('CDragon').'\\TftClient')
+            ->setType($this->resolveNamespace('Assets\\Tft').'\\TftClient')
             ->setPublic()
             ->setReadOnly();
 

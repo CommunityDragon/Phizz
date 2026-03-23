@@ -3,7 +3,7 @@
 namespace Phizz;
 
 use Phizz\Apis\Client;
-use Phizz\CDragon\CDragonClient;
+use Phizz\Assets\AssetClient;
 use Phizz\Support\Cache;
 use Phizz\Support\Configuration;
 use Phizz\Support\HttpClient;
@@ -19,9 +19,9 @@ class Phizz extends Client
         );
     }
 
-    public function cdragon(?string $version = null): CDragonClient
+    public function cdragon(?string $version = null): AssetClient
     {
-        return new CDragonClient(
+        return new AssetClient(
             version: $version ?? $this->config->cdragonVersion,
             http: new StaticClient,
         );

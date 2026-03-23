@@ -11,6 +11,8 @@ use Phizz\Support\StaticApi;
 use Phizz\Support\StaticClient;
 use Phizz\Support\StaticData;
 
+beforeEach(fn () => StaticApi::clearCache());
+
 function makeCDragonHttp(array $responses, array &$history = []): StaticClient
 {
     $stack = HandlerStack::create(new MockHandler($responses));
@@ -92,15 +94,17 @@ it('returns a single typed object when id and idField are given', function () {
         ->and($result->name)->toBe('B');
 });
 
-it('throws InvalidArgumentException when the id is not found', function () {
+it('returns null when the id is not found', function () {
     $itemClass = new class([], 'v') extends StaticData {};
 
     $data = [['id' => 1]];
     $http = makeCDragonHttp([new Response(200, [], json_encode($data))]);
     $api = makeApi($http);
 
-    $api->callFetch('/v1/items.json', collectionType: $itemClass::class, idField: 'id', id: 999);
-})->throws(InvalidArgumentException::class, "Item '999' not found.");
+    $result = $api->callFetch('/v1/items.json', collectionType: $itemClass::class, idField: 'id', id: 999);
+
+    expect($result)->toBeNull();
+});
 
 it('does not issue a second HTTP request for the same path', function () {
     $history = [];

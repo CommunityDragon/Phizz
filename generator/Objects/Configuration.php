@@ -14,15 +14,14 @@ class Configuration
     public readonly array $games;
 
     /**
-     * @param  array<string, array>  $routes
-     * @param  array<string, array>  $enums
+     * @param  CDragonEndpoint[]  $endpoints
      */
     public function __construct(
         public readonly OutputInterface $console,
         public readonly OpenApi $schema,
+        public readonly array $endpoints,
         public readonly array $routes,
         public readonly array $enums,
-        public readonly string $cdragonVersion = 'latest',
     ) {
         $this->games = $this->resolveGames();
     }

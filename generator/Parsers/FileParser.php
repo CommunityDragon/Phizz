@@ -3,49 +3,46 @@
 namespace Phizz\Generator\Parsers;
 
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * @template T of mixed
  */
 class FileParser
 {
-    public function __construct(protected OutputInterface $console) {}
+    public function __construct(
+        protected OutputInterface $console,
+        protected Client $client = new Guzzle(['timeout' => 30])
+    ) {}
 
     /**
      * @return T
      *
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws Exception
+     * @throws GuzzleException
      */
-    public function parse(string $file)
+    public function parse(string $entry)
     {
-        $filename = basename($file);
-        $source = Str::isUrl($file) ? 'url' : 'file';
+        $filename = basename($entry);
+        $source = Str::isUrl($entry) ? 'url' : 'file';
 
         $this->console->writeln(
-            "  <fg=blue;options=bold>  GET  </>  <fg=white>{$filename}</>  <fg=gray>{$source}</>"
+            "  <fg=blue;options=bold>  GET  </>  <fg=white>$filename</>  <fg=gray>{$source}</>"
         );
 
-        $content = $this->getContent($file);
-        $kb = number_format(strlen($content) / 1024, 1);
+        [$content, $size] = $this->getContent($entry);
+        $kb = number_format($size / 1024, 1);
 
         $object = $this->parseContent($content);
 
         $this->console->writeln(
-            "  <fg=green>   ✓   </>  <fg=cyan>{$kb} KB</>  <fg=gray>fetched and parsed</>"
+            "  <fg=green>   ✓   </>  <fg=cyan>$kb KB</>  <fg=gray>fetched and parsed</>"
         );
 
         return $object;
@@ -60,35 +57,38 @@ class FileParser
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws Exception
+     * @return array{0: string, 1: int}
+     *
+     * @throws GuzzleException
      */
-    protected function getContent(string $file): string
+    protected function getContent(string $file): array
     {
         return Str::isUrl($file) ? $this->getUrl($file) : $this->getFile($file);
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ClientExceptionInterface
+     * @return array{0: string, 1: int}
+     *
+     * @throws GuzzleException
      */
-    protected function getUrl(string $file): string
+    protected function getUrl(string $file): array
     {
-        $client = HttpClient::create();
-        $response = $client->request('GET', $file);
+        $response = $this->client->get($file);
+        $body = $response->getBody();
+        $size = $response->getHeader('Content-Length')[0] ?? -1;
+        if ($size === -1) {
+            $size = $body->getSize();
+        }
 
-        return $response->getContent();
+        return [(string) $body, $size];
     }
 
     /**
+     * @return array{0: string, 1: int}
+     *
      * @throws Exception
      */
-    protected function getFile(string $file): string
+    protected function getFile(string $file): array
     {
         $finder = new Finder;
 
@@ -100,6 +100,9 @@ class FileParser
             throw new Exception("File not found: $file");
         }
 
-        return $found->getContents();
+        $content = $found->getContents();
+        $size = $found->getSize() === false ? 0 : $found->getSize();
+
+        return [$content, $size];
     }
 }
