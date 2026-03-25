@@ -2,24 +2,28 @@
 
 namespace Phizz;
 
-use Closure;
-
 class Retry
 {
-    private function __construct(private readonly Closure $delay) {}
+    private function __construct(
+        private readonly string $strategy,
+        private readonly int $value,
+    ) {}
 
     public function delay(int $attempt): int
     {
-        return ($this->delay)($attempt);
+        return match ($this->strategy) {
+            'exponential' => $this->value * (2 ** $attempt),
+            default => $this->value,
+        };
     }
 
     public static function exponential(int $base = 1): self
     {
-        return new self(fn (int $attempt) => $base * (2 ** $attempt));
+        return new self('exponential', $base);
     }
 
     public static function fixed(int $seconds = 2): self
     {
-        return new self(fn () => $seconds);
+        return new self('fixed', $seconds);
     }
 }
