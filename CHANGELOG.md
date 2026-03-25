@@ -2,6 +2,10 @@
 
 All notable changes to `phizz` will be documented in this file.
 
+## Make Retry serializable - 2026-03-25
+
+**Full Changelog**: https://github.com/CommunityDragon/Phizz/compare/v0.5.0...v0.5.1
+
 ## Reimplement CommunityDragon integration - 2026-03-23
 
 **Full Changelog**: https://github.com/CommunityDragon/Phizz/compare/v0.4.1...v0.5.0
