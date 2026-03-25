@@ -26,4 +26,9 @@ class Retry
     {
         return new self('fixed', $seconds);
     }
+
+    public static function __set_state(array $array): self
+    {
+        return new self($array['strategy'], $array['value']);
+    }
 }
